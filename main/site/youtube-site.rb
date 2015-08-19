@@ -108,8 +108,8 @@ class YouTubeSite < MovieSite
       @comments = "" #find(:xpath, '').text
       puts "comments => #{@comments}"
 
-      #@shumbnail = find(:xpath, 'div//img')[:src]
-      puts "shumbnail => #{@shumbnail}"
+      #@thumbnail = find(:xpath, 'div//img')[:src]
+      puts "thumbnail => #{@thumbnail}"
 
       puts ""
 

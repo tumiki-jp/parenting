@@ -4,9 +4,9 @@ require 'capybara/dsl'
 require 'selenium-webdriver'
 
 # Site
-require './site/site.rb'
-require './site/base/movie-site.rb'
-require './site/youtube-site.rb'
+require './main/site/site.rb'
+require './main/site/base/movie-site.rb'
+require './main/site/youtube-site.rb'
 
 # Capybaraの初期設定
 Capybara.current_driver = :selenium
