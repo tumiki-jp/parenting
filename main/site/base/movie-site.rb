@@ -13,7 +13,7 @@ class MovieSite
   attr_reader :like_count
   attr_reader :dislike_count
   attr_reader :comments
-  attr_reader :shumbnail
+  attr_reader :thumbnail
 
   def initialize()
     raise "not implement exception. please override initialize()"
