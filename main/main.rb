@@ -7,8 +7,10 @@ require 'selenium-webdriver'
 require './main/site/site.rb'
 require './main/site/base/movie-site.rb'
 require './main/site/base/cook-site.rb'
+require './main/site/base/qa-site.rb'
 require './main/site/youtube-site.rb'
 require './main/site/cookpad-site.rb'
+require './main/site/yahoochiebukuro-site.rb'
 
 # Capybaraの初期設定
 Capybara.current_driver = :selenium
@@ -25,9 +27,9 @@ Capybara.default_wait_time = 10
 # クローリングするサイトを定義
 # -------------------------------------------------------
 sites = []
-sites << Site.new(YouTubeSite.new)
-sites << Site.new(CookpadSite.new)
-# sites << Site.new(YahooChiebukuroSite.new)
+# sites << Site.new(YouTubeSite.new)
+# sites << Site.new(CookpadSite.new)
+sites << Site.new(YahooChiebukuroSite.new)
 # sites << Site.new(HatenaBlogSite.new)
 
 # -------------------------------------------------------
