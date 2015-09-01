@@ -1,7 +1,8 @@
-main
+main.rb
   rubyを実行するmainクラス
 
-Site
+crawler.rb
+  クローラーの大元のクラス
 
 MovieSite
   YouTubeSite
