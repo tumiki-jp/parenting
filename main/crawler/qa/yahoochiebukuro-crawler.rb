@@ -7,24 +7,21 @@ class YahooChiebukuroCrawler < QACrawler
     @site_url = "http://chiebukuro.yahoo.co.jp/"
   end
 
-  def crawl()
+  def crawl_qa()
+    qa_site_datas = []
 
     # Step 2 Click category
     find(:xpath, '//*[@id="h_nav"]/ul/li[2]/a').click
-
     # Step 3 Click detail category
     find(:xpath, '//a[contains(text(), "子育ての悩み")]').click
-
     # Step 4 Filter
     find(:xpath, '//a[text()="解決済みの質問"]').click
-
     # Step 5 Sort
     sleep 1
     find(:xpath, '//a[text()="質問日時"]').click
 
     # Step 6 get metadata
     sleep 1
-
     #get category
     tags = []
     tags << all(:xpath, '//div[@class="topicPass clrfx"]/ol/li/a/span').last.text
@@ -40,9 +37,19 @@ class YahooChiebukuroCrawler < QACrawler
       tags: tags,
       update_date: update_date)
 
-      puts qa_site_data
+      qa_site_datas.push(qa_site_data)
     end
 
+    return qa_site_datas
+  end
+
+  def creansing_qa(crawler_data)
+
+    # update_date
+    # 質問日時：2015/09/09 15:44:05
+    crawler_data.update_date.slice!("質問日時：")
+
+    return crawler_data
   end
 
 end
