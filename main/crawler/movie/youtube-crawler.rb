@@ -40,7 +40,14 @@ class YouTubeCrawler < MovieCrawler
       urls << movie_element.find(:xpath, 'div//h3[contains(@class, "yt-lockup-title ")]/a')[:href]
     end
 
+    debug = 0
     urls.each do |url|
+      debug += 1
+      if debug > 2
+        break
+      end
+
+
       # Step 7 Get metadata
       visit(url)
 
