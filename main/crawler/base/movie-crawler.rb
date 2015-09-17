@@ -29,22 +29,46 @@ class MovieCrawler < Crawler
   end
 
   def save_data_base(connection, creansing_datas)
-    query = "INSERT INTO movie_site_data (url, title, description, tags, release_date,
-    view_count, like_count, dislike_count, comments, thumbnail)
-    VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
+    query_update = "UPDATE movie_site_data
+                    SET    title = $1,
+                           description = $2,
+                           tags = $3,
+                           release_date = $4,
+                           view_count = $5,
+                           like_count = $6,
+                           dislike_count = $7,
+                           comments = $8,
+                           thumbnail = $9
+                    WHERE  url = $10;"
 
+    query_insert = "INSERT INTO movie_site_data (url, title, description, tags, release_date,
+    view_count, like_count, dislike_count, comments, thumbnail)
+    SELECT $1, $2, $3, $4, $5, $6, $7, $8, $9, $10
+    WHERE  NOT EXISTS(SELECT * FROM movie_site_data WHERE url = $1);"
+
+    updated_record = 0
+    inserted_record = 0
     creansing_datas.each do |data|
       # cast
       data.view_count = data.view_count.to_i
       data.like_count = data.like_count.to_i
       data.dislike_count = data.dislike_count.to_i
 
+      # ------------------------------------------------
       # execute
-      connection.exec(query, [data.url, data.title, data.description, data.tags,
+      # ------------------------------------------------
+      result = connection.exec(query_update, [data.title, data.description, data.tags,
+      data.release_date, data.view_count, data.like_count, data.dislike_count,
+      data.comments, data.thumbnail, data.url])
+      updated_record += result.cmdtuples
+
+      result = connection.exec(query_insert, [data.url, data.title, data.description, data.tags,
       data.release_date, data.view_count, data.like_count, data.dislike_count,
       data.comments, data.thumbnail])
+      inserted_record += result.cmdtuples
     end
-
+    puts "#{Time.new()} : UPDATED QUERY #{updated_record} datas"
+    puts "#{Time.new()} : INSERTED QUERY #{inserted_record} datas"
   end
 
 

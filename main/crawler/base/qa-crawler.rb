@@ -26,14 +26,32 @@ class QACrawler < Crawler
   end
 
   def save_data_base(connection, creansing_datas)
-    query = "INSERT INTO qa_site_data (url, title, tags, update_date) VALUES($1, $2, $3, $4)"
+    query_update = "UPDATE qa_site_data
+                    SET    title = $1,
+                           tags = $2,
+                           update_date = $3
+                    WHERE  url = $4;"
 
+    query_insert = "INSERT INTO qa_site_data (url, title, tags, update_date)
+    SELECT $1, $2, $3, $4
+    WHERE NOT EXISTS(SELECT * FROM qa_site_data WHERE url = $1);"
+
+    updated_record = 0
+    inserted_record = 0
     creansing_datas.each do |data|
       # cast
 
+      # ------------------------------------------------
       # execute
-      connection.exec(query, [data.url, data.title, data.tags, data.update_date])
+      # ------------------------------------------------
+      result = connection.exec(query_update, [data.title, data.tags, data.update_date, data.url])
+      updated_record += result.cmdtuples
+
+      result = connection.exec(query_insert, [data.url, data.title, data.tags, data.update_date])
+      inserted_record += result.cmdtuples
     end
+    puts "#{Time.new()} : UPDATED QUERY #{updated_record} datas"
+    puts "#{Time.new()} : INSERTED QUERY #{inserted_record} datas"
   end
 
 
