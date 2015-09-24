@@ -1,0 +1,9 @@
+movie_crawler:
+  search_word:
+    - "子育て 1歳"
+    - "離乳食"
+
+cook_crawler:
+  search_word:
+    - "離乳食"
+    - "幼児食"

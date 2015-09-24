@@ -10,6 +10,10 @@ class MovieCrawler < Crawler
   end
 
   def crawl_base()
+    # load crawler settings
+    crawler_settings = YAML.load_file('./main/config/crawler-settings.yml')
+    @keywords = crawler_settings["movie_crawler"]["search_word"]
+
     crawler_datas = []
     @keywords.each do |keyword|
       puts "#{Time.new()} : CRAWL KEYWORD => #{keyword}"
