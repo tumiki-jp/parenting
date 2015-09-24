@@ -5,10 +5,6 @@ class YouTubeCrawler < MovieCrawler
 
   def initialize()
     @site_url = "https://www.youtube.com/"
-    @keywords = [
-      "子育て 1歳",
-      "離乳食",
-    ]
 
   end
 

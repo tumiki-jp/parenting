@@ -5,10 +5,7 @@ class CookpadCrawler < CookCrawler
 
   def initialize()
     @site_url = "https://www.cookpad.com/"
-    @keywords = [
-      "離乳食",
-      # "幼児食",
-    ]
+    
   end
 
   def crawl_cook(keyword)

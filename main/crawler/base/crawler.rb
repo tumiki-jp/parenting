@@ -1,6 +1,7 @@
 # _*_ coding: utf-8 _*_
 require 'pg'
 require './main/config/capybara-config.rb'
+require 'yaml'
 
 class Crawler
   #
