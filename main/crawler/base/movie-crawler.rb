@@ -76,7 +76,6 @@ class MovieCrawler < Crawler
 
     updated_record = 0
     inserted_record = 0
-    puts "#{Time.new()} : UPDATE DATAS => #{generate_tags_datas}"
     generate_tags_datas.each do |data|
       # ------------------------------------------------
       # execute
