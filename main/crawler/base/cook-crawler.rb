@@ -1,5 +1,6 @@
 # _*_ coding: utf-8 _*_
 require './main/crawler/base/crawler.rb'
+require './main/library/tag-analyzer.rb'
 
 class CookCrawler < Crawler
 
@@ -32,7 +33,27 @@ class CookCrawler < Crawler
     return cleansing_datas
   end
 
-  def save_data_base(connection, creansing_datas)
+  def cast_type_base(creansing_datas)
+    creansing_datas.each do |data|
+      # cast
+    end
+    return creansing_datas
+  end
+
+  def generate_tags_base(cast_datas)
+    cast_datas.each do |data|
+      # 先に文字列を一つにくっつけておくほうがいいかなと思った
+      source = data.title + data.description
+
+      tags = TagGenerator.parse(data.url, source)
+      data.tags += tags
+      data.tags.uniq!
+      puts "#{Time.new()} : GENERATED TAGS => #{tags}; UPDATED TAGS => #{data.tags}"
+    end
+    return cast_datas
+  end
+
+  def save_data_base(connection, generate_tags_datas)
     query_update = "UPDATE cook_site_data
                     SET    title = $1,
                            description = $2,
@@ -46,9 +67,8 @@ class CookCrawler < Crawler
 
     updated_record = 0
     inserted_record = 0
-    creansing_datas.each do |data|
-      # cast
-
+    puts "#{Time.new()} : UPDATE DATAS => #{generate_tags_datas}"
+    generate_tags_datas.each do |data|
       # ------------------------------------------------
       # execute
       # ------------------------------------------------
@@ -83,12 +103,12 @@ end
 
 class CookSiteData
 
-  attr_reader :url
-  attr_reader :title
-  attr_reader :description
-  attr_reader :tags
-  attr_reader :release_date
-  attr_reader :thumbnail
+  attr_accessor :url
+  attr_accessor :title
+  attr_accessor :description
+  attr_accessor :tags
+  attr_accessor :release_date
+  attr_accessor :thumbnail
 
   def initialize(args)
     @url = args[:url]

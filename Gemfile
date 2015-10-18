@@ -9,3 +9,6 @@ gem 'selenium-webdriver', '>= 2.46.2'
 
 # database
 gem 'pg', '>= 0.18.3'
+
+# Morphological Analysis
+gem 'mecab', '>= 0.966'

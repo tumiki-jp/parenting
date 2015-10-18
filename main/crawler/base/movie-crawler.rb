@@ -1,5 +1,6 @@
 # _*_ coding: utf-8 _*_
 require './main/crawler/base/crawler.rb'
+require './main/library/tag-analyzer.rb'
 
 class MovieCrawler < Crawler
 
@@ -32,7 +33,30 @@ class MovieCrawler < Crawler
     return cleansing_datas
   end
 
-  def save_data_base(connection, creansing_datas)
+  def cast_type_base(creansing_datas)
+    creansing_datas.each do |data|
+      # cast
+      data.view_count = data.view_count.to_i
+      data.like_count = data.like_count.to_i
+      data.dislike_count = data.dislike_count.to_i
+    end
+    return creansing_datas
+  end
+
+  def generate_tags_base(cast_datas)
+    cast_datas.each do |data|
+      # 先に文字列を一つにくっつけておくほうがいいかなと思った
+      source = data.title + data.description
+
+      tags = TagGenerator.parse(data.url, source)
+      data.tags += tags
+      data.tags.uniq!
+      puts "#{Time.new()} : GENERATED TAGS => #{tags}; UPDATED TAGS => #{data.tags}"
+    end
+    return cast_datas
+  end
+
+  def save_data_base(connection, generate_tags_datas)
     query_update = "UPDATE movie_site_data
                     SET    title = $1,
                            description = $2,
@@ -52,12 +76,8 @@ class MovieCrawler < Crawler
 
     updated_record = 0
     inserted_record = 0
-    creansing_datas.each do |data|
-      # cast
-      data.view_count = data.view_count.to_i
-      data.like_count = data.like_count.to_i
-      data.dislike_count = data.dislike_count.to_i
-
+    puts "#{Time.new()} : UPDATE DATAS => #{generate_tags_datas}"
+    generate_tags_datas.each do |data|
       # ------------------------------------------------
       # execute
       # ------------------------------------------------
