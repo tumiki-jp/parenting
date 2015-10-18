@@ -1,5 +1,6 @@
 # _*_ coding: utf-8 _*_
 require './main/crawler/base/crawler.rb'
+require './main/library/tag-analyzer.rb'
 
 class QACrawler < Crawler
 
@@ -25,7 +26,27 @@ class QACrawler < Crawler
     return cleansing_datas
   end
 
-  def save_data_base(connection, creansing_datas)
+  def cast_type_base(creansing_datas)
+    creansing_datas.each do |data|
+      # cast
+    end
+    return creansing_datas
+  end
+
+  def generate_tags_base(cast_datas)
+    cast_datas.each do |data|
+      # 先に文字列を一つにくっつけておくほうがいいかなと思った
+      source = data.title
+
+      tags = TagGenerator.parse(data.url, source)
+      data.tags += tags
+      data.tags.uniq!
+      puts "#{Time.new()} : GENERATED TAGS => #{tags}; UPDATED TAGS => #{data.tags}"
+    end
+    return cast_datas
+  end
+
+  def save_data_base(connection, generate_tags_datas)
     query_update = "UPDATE qa_site_data
                     SET    title = $1,
                            tags = $2,
@@ -38,9 +59,7 @@ class QACrawler < Crawler
 
     updated_record = 0
     inserted_record = 0
-    creansing_datas.each do |data|
-      # cast
-
+    generate_tags_datas.each do |data|
       # ------------------------------------------------
       # execute
       # ------------------------------------------------
@@ -74,10 +93,10 @@ class QACrawler < Crawler
 end
 
 class QASiteData
-  attr_reader :url
-  attr_reader :title
-  attr_reader :tags
-  attr_reader :update_date
+  attr_accessor :url
+  attr_accessor :title
+  attr_accessor :tags
+  attr_accessor :update_date
 
   def initialize(args)
     @url = args[:url]

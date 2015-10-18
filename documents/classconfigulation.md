@@ -20,6 +20,9 @@ BlogSite
 NewsSite
   NikkeiNewsSite
 
-
-#TODO
-capybara-config.rbにcapybaraの初期設定等を記述する
+[library]
+  tfidf.rb … TF-IDF値を計算する
+  tfidf-parenting.rb … Parenting(子育て)のTF-IDF値を計算する。
+                        データ(ドキュメント)を渡したら、そのデータの単語毎のtfidfをハッシュで返す
+  tfidf-parenting.json … クローラーで収集したデータ毎の単語情報を保持する。
+                          IDF値の計算で使用する。

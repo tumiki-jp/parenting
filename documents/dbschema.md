@@ -14,4 +14,12 @@
 |10|comments|コメント|
 
 * サムネイル画像はいらないかも。動画を引用したら勝手にサムネイル表示されてるかもしれないから。
-* 
+*
+
+uniqeKey
+url
+tags
+
+
+documents_total (total)
+documents_included_word_count (word, count)
