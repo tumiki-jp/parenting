@@ -26,15 +26,24 @@ class DocumentAnalyzer
   # ドキュメントから指定した品詞を抽出するメソッド
   # part_of_speech_patternには正規表現を指定する /名詞|動詞|形容詞/
   # 戻り値は単語ごとの出現回数を持ったハッシュ { "単語A" => 1, "単語B" => 3, "単語C" => 2}
-  def self.get_part_of_speech(document, part_of_speech_pattern)
+  # add_adjective_pre_nounは名詞の前に形容詞があった場合はそれで一つの単語として登録するかどうか
+  def self.get_part_of_speech(document, part_of_speech_pattern, add_adjective_pre_noun)
     # step1 Mecabで構文解析
     mecab = MeCab::Tagger.new("-Ochasen -d /usr/local/Cellar/mecab/0.996/lib/mecab/dic/mecab-ipadic-neologd")
+
     parseNode = mecab.parseToNode(document)
     # step2 引数で受け取った品詞で絞り込み
     filtered_words = []
+    previousNode = nil
     while parseNode
-      filtered_words.push(parseNode.surface) if part_of_speech_pattern =~ parseNode.feature.split(/,/)[0]
-      parseNode = parseNode.next
+      # parseNode.featureの内容 => "名詞,サ変接続,*,*,*,*,育児,イクジ,イクジ"
+      if part_of_speech_pattern =~ parseNode.feature
+        word = ""
+        word += previousNode.surface if add_adjective_pre_noun && /形容詞/ =~ previousNode.feature
+        filtered_words.push(word + parseNode.surface)
+      end
+      previousNode = parseNode # previousNodeを更新
+      parseNode = parseNode.next # 次のnodeへ
     end
     # step3 単語ごとに出現回数を集計する
     words_count_hash = Hash.new(0)
@@ -44,36 +53,20 @@ class DocumentAnalyzer
     return words_count_hash
   end
 
-  # ドキュメントから指定した品詞(数値は除く)を抽出するメソッド
-  # part_of_speech_patternには正規表現を指定する /名詞|動詞|形容詞/
-  # 戻り値は単語ごとの出現回数を持ったハッシュ { "単語A" => 1, "単語B" => 3, "単語C" => 2}
-  def self.get_part_of_speech_exclude_number(document, part_of_speech_pattern)
-    # step1 Mecabで構文解析
-    mecab = MeCab::Tagger.new("-Ochasen -d /usr/local/Cellar/mecab/0.996/lib/mecab/dic/mecab-ipadic-neologd")
-    parseNode = mecab.parseToNode(document)
-    # step2 引数で受け取った品詞で絞り込み
-    filtered_words = []
-    while parseNode
-      filtered_words.push(parseNode.surface) if part_of_speech_pattern =~ parseNode.feature.split(/,/)[0]
-      parseNode = parseNode.next
+  # documentからblacklistの文字列を取り除く
+  def self.get_excluded_phrases(document, blacklist)
+    blacklist.each do |word|
+      document.gsub!(/#{word}/, "")
     end
-    # step3 単語ごとに出現回数を集計する
-    words_count_hash = Hash.new(0)
-    filtered_words.each do |word|
-      words_count_hash[word] += 1
-    end
-    # step4 数値を除く
-    words_count_hash.delete("0")
-    words_count_hash.delete("1")
-    words_count_hash.delete("2")
-    words_count_hash.delete("3")
-    words_count_hash.delete("4")
-    words_count_hash.delete("5")
-    words_count_hash.delete("6")
-    words_count_hash.delete("7")
-    words_count_hash.delete("8")
-    words_count_hash.delete("9")
-
-    return words_count_hash
+    return document
   end
+
+  # wordsからblacklistの文字列を取り除く
+  def self.get_excluded_words(words, blacklist)
+    blacklist.each do |word|
+      words.delete(word)
+    end
+    return words
+  end
+
 end
