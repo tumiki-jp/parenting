@@ -9,17 +9,30 @@ require './main/library/tfidf/tfidf.rb'
 class TfidfParenting
   def initialize()
     @file_path = './main/library/tfidf/tfidf-parenting.json'
+    @blacklist_phrases_file_path = './main/library/util/blacklist-phrases.json'
+    @blacklist_file_path = './main/library/util/blacklist-words.json'
   end
 
   # key = documentを識別するためのキー。URLを渡す
   # document = 文書(文字列)を受け取る
   def get_parenting_tfidf(key, document)
 
-      # step1 名詞を抽出する 例 { "単語A" => 2, "単語B" => 3, "単語C" => 1}
-      words = DocumentAnalyzer.get_part_of_speech_exclude_number(document, /名詞/)
-      # step2 まずはデータベース(jsonファイル)を更新
+      # step1 documentから余計な文字列を取り除く
+      json_data = read(@blacklist_phrases_file_path)
+      document = DocumentAnalyzer.get_excluded_phrases(document, json_data["blacklist"].values)
+
+      # step2 名詞を抽出する 例 { "単語A" => 2, "単語B" => 3, "単語C" => 1}
+      target = /名詞,一般|名詞,固有名詞/
+      words = DocumentAnalyzer.get_part_of_speech(document, target, true)
+
+      # step3 抽出した単語から余計な単語を取り除く
+      json_data = read(@blacklist_file_path)
+      words = DocumentAnalyzer.get_excluded_words(words, json_data["blacklist"])
+
+      # step4 データベース(jsonファイル)を更新
       update_database(key, words)
-      # step3 TF-IDF値を求める
+
+      # step5 TF-IDF値を求める
       tfidf_hash = get_tfidf(key)
 
       return tfidf_hash
